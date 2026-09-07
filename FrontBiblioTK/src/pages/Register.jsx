@@ -72,4 +72,5 @@ function Register({ onBack }) {
   )
 }
 
+
 export default Register
