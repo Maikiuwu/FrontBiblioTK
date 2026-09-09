@@ -6,7 +6,15 @@ function Login({ onLogin, onRegister }) {
 
 	function handleSubmit(event) {
 		event.preventDefault();
-		onLogin(email || "María González");
+		// TODO: reemplazar por la respuesta real del backend cuando exista el login.
+		// Mientras tanto: si el correo contiene "admin" se simula ese rol; en
+		// cualquier otro caso se usan los datos quemados de María González (lector),
+		// que es el caso que están usando para probar.
+		const isAdmin = email.toLowerCase().includes("admin");
+		const user = isAdmin
+			? { nombre: "Admin BiblioTK", email, rol: "admin" }
+			: { nombre: "María González", email, rol: "lector" };
+		onLogin(user);
 	}
 
 	return (
