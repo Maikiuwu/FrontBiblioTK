@@ -98,7 +98,7 @@ export function LoanTable({ compact = false, rows = loans }) {
 	);
 }
 
-function Dashboard() {
+function Dashboard({ onLogout }) {
 	return (
 		<div className="mx-auto w-full max-w-[1120px] px-5 py-8 pb-[50px] md:px-[6%] md:py-12 md:pb-[70px]">
 			<header className="mb-[27px] flex items-start justify-between md:mb-[38px]">
@@ -112,10 +112,10 @@ function Dashboard() {
 				</div>
 				<button
 					type="button"
-					className="relative border-0 bg-transparent text-[17px] text-[#c28b4e]"
-					aria-label="Notificaciones"
+					className="border-0 bg-transparent px-0 text-xs font-bold text-[#a77a46] hover:underline"
+					onClick={onLogout}
 				>
-					2
+					Cerrar sesión
 				</button>
 			</header>
 			<section className="mb-[26px] min-h-[198px] bg-[#295c4e] px-[25px] py-7 text-[#f5f3e7] md:px-[39px] md:py-[33px]">
