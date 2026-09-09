@@ -16,8 +16,8 @@ function Login({ onLogin, onRegister, sessionMessage }) {
 
 		try {
 			const loginData = createLoginUserDto({ email, password, rememberMe });
-			await loginUser(loginData);
-			onLogin();
+			const sessionData = await loginUser(loginData);
+			onLogin(sessionData);
 		} catch (loginError) {
 			setError(loginError.message);
 		} finally {

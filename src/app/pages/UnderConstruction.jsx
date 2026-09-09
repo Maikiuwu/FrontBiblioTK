@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-function UnderConstruction() {
+function UnderConstruction({ onLogout }) {
     const navigate = useNavigate();
 
     return (
@@ -29,7 +29,7 @@ function UnderConstruction() {
                 <button
                     type="button"
                     className="relative z-10 border-0 bg-[#c28b4e] px-6 py-3 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#a8733c]"
-                    onClick={() => navigate("/login")}
+                    onClick={onLogout}
                 >
                     Cerrar sesión
                 </button>

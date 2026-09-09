@@ -13,7 +13,7 @@ const initialFormData = {
 };
 
 function Register({ onBack }) {
-	
+
 	const [submitted, setSubmitted] = useState(false);
 	const [formData, setFormData] = useState(initialFormData);
 

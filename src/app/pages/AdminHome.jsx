@@ -51,7 +51,7 @@ function StatCard({ label, value, loading }) {
     );
 }
 
-function AdminHome() {
+function AdminHome({ onLogout }) {
     const navigate = useNavigate();
     const [stats, setStats] = useState({});
     const [statsLoading, setStatsLoading] = useState(true);
@@ -80,7 +80,7 @@ function AdminHome() {
 
     return (
         <div className="flex min-h-screen flex-col bg-[#f6f3ed] font-['Inter','Segoe_UI',sans-serif] text-[#18332d] md:flex-row">
-            <AdminSidebar onLogout={() => navigate("/login")} />
+            <AdminSidebar onLogout={onLogout} />
             <main className="mx-auto w-full max-w-[1120px] px-5 py-8 pb-[50px] md:px-[6%] md:py-12 md:pb-[70px]">
                 <header className="mb-[27px] md:mb-[38px]">
                     <p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#a77a46]">
@@ -120,8 +120,8 @@ function AdminHome() {
                             disabled={!option.available}
                             onClick={() => option.path && navigate(option.path)}
                             className={`flex flex-col items-start gap-3 border-0 bg-[#fffdf9] px-6 py-6 text-left shadow-[0_10px_30px_rgba(38,63,53,0.05)] transition ${option.available
-                                    ? "cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_14px_34px_rgba(38,63,53,0.1)]"
-                                    : "cursor-not-allowed opacity-60"
+                                ? "cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_14px_34px_rgba(38,63,53,0.1)]"
+                                : "cursor-not-allowed opacity-60"
                                 }`}
                         >
                             <div className="flex w-full items-center justify-between">
