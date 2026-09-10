@@ -6,18 +6,38 @@ import {
 	useLocation,
 	useNavigate,
 } from "react-router-dom";
+
 import {
 	getCurrentSession,
 	logoutUser,
 } from "../../service/LoginService";
+
+import AdminHome from "./AdminHome.jsx";
+import Construccion from "./Construccion.jsx";
 import Dashboard from "./Dashboard.jsx";
 import Login from "./Login.jsx";
 import Register from "./Register.jsx";
+import UserDashboard from "./UserDashboard.jsx";
+
+function getSessionRole(session) {
+	return String(
+		session?.user?.rol ??
+			session?.user?.role ??
+			session?.rol ??
+			session?.role ??
+			"",
+	).toLowerCase();
+}
+
+function getAuthenticatedPath(session) {
+	return getSessionRole(session) === "admin" ? "/admin" : "/construccion";
+}
 
 function App() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const [authStatus, setAuthStatus] = useState("checking");
+	const [session, setSession] = useState(null);
 	const [sessionMessage, setSessionMessage] = useState("");
 
 	useEffect(() => {
@@ -30,18 +50,23 @@ function App() {
 		setAuthStatus("checking");
 
 		getCurrentSession()
-			.then(() => {
+			.then((currentSession) => {
 				if (!isActive) return;
+				setSession(currentSession);
 				setAuthStatus("authenticated");
 				setSessionMessage("");
 				if (location.pathname === "/" || location.pathname === "/login") {
-					navigate("/dashboard", { replace: true });
+					navigate(getAuthenticatedPath(currentSession), { replace: true });
 				}
 			})
 			.catch(() => {
 				if (!isActive) return;
+				setSession(null);
 				setAuthStatus("anonymous");
-				if (location.pathname === "/dashboard") {
+				if (
+					location.pathname.startsWith("/admin") ||
+					location.pathname === "/construccion"
+				) {
 					setSessionMessage("Tu sesión finalizó. Debes iniciar sesión nuevamente.");
 					navigate("/login", { replace: true });
 				} else if (location.pathname === "/") {
@@ -55,14 +80,20 @@ function App() {
 	}, [location.pathname, navigate]);
 
 	useEffect(() => {
-		if (authStatus !== "authenticated" || location.pathname !== "/dashboard") {
+		if (
+			authStatus !== "authenticated" ||
+			(!location.pathname.startsWith("/admin") &&
+				location.pathname !== "/construccion")
+		) {
 			return undefined;
 		}
 
 		const sessionCheck = window.setInterval(async () => {
 			try {
-				await getCurrentSession();
+				const currentSession = await getCurrentSession();
+				setSession(currentSession);
 			} catch {
+				setSession(null);
 				setAuthStatus("anonymous");
 				setSessionMessage("Tu sesión finalizó. Debes iniciar sesión nuevamente.");
 				navigate("/login", { replace: true });
@@ -76,6 +107,7 @@ function App() {
 		try {
 			await logoutUser();
 		} finally {
+			setSession(null);
 			setAuthStatus("anonymous");
 			navigate("/login", { replace: true });
 		}
@@ -95,10 +127,15 @@ function App() {
 				path="/login"
 				element={
 					authStatus === "authenticated" ? (
-						<Navigate to="/dashboard" replace />
+						<Navigate to={getAuthenticatedPath(session)} replace />
 					) : (
 					<Login
-						onLogin={() => navigate("/dashboard", { replace: true })}
+							onLogin={async () => {
+								const currentSession = await getCurrentSession();
+								setSession(currentSession);
+								setAuthStatus("authenticated");
+								navigate(getAuthenticatedPath(currentSession), { replace: true });
+							}}
 						onRegister={() => navigate("/register")}
 						sessionMessage={sessionMessage}
 					/>
@@ -110,15 +147,36 @@ function App() {
 				element={<Register onBack={() => navigate("/login")} />}
 			/>
 			<Route
-				path="/dashboard"
+				path="/admin"
 				element={
-					authStatus === "authenticated" ? (
-						<Dashboard onLogout={handleLogout} />
+					authStatus === "authenticated" && getSessionRole(session) === "admin" ? (
+						<AdminHome onLogout={handleLogout} />
 					) : (
 						<Navigate to="/login" replace />
 					)
 				}
 			/>
+			<Route
+				path="/admin/usuarios"
+				element={
+					authStatus === "authenticated" && getSessionRole(session) === "admin" ? (
+						<UserDashboard onLogout={handleLogout} />
+					) : (
+						<Navigate to="/login" replace />
+					)
+				}
+			/>
+			<Route
+				path="/construccion"
+				element={
+					authStatus === "authenticated" ? (
+						<Construccion onLogout={handleLogout} />
+					) : (
+						<Navigate to="/login" replace />
+					)
+				}
+			/>
+			<Route path="/dashboard" element={<Navigate to="/construccion" replace />} />
 			<Route path="*" element={<Navigate to="/login" replace />} />
 		</Routes>
 	);
