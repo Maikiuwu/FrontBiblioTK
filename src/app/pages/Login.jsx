@@ -10,11 +10,21 @@ function Login({ onLogin, onRegister, sessionMessage }) {
 	const [rememberMe, setRememberMe] = useState(false);
 	const [error, setError] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	function isValidEmail(value) {
+		return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
+	}
 	
 
 	async function handleSubmit(event) {
 		event.preventDefault();
 		setError("");
+
+		if (!isValidEmail(email)) {
+			setError("Ingresa un correo válido, por ejemplo: tu@correo.com.");
+			return;
+		}
+
 		setIsSubmitting(true);
 
 		try {
@@ -90,6 +100,8 @@ function Login({ onLogin, onRegister, sessionMessage }) {
 							value={email}
 							onChange={(event) => setEmail(event.target.value)}
 							placeholder="tu@correo.com"
+							pattern="[^\s@]+@[^\s@]+\.[^\s@]{2,}"
+							title="Usa un correo con dominio, por ejemplo tu@correo.com"
 							className="w-full rounded-[3px] border border-[#d7d8ce] bg-[#fffdf9] px-[15px] py-3.5 text-sm text-[#18332d] outline-none transition-[border,box-shadow] placeholder:text-[#87958d] focus:border-[#3d7966] focus:shadow-[0_0_0_3px_#dcebe2]"
 							required
 						/>
