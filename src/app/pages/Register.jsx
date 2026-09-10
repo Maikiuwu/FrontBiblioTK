@@ -86,7 +86,7 @@ function Register({ onBack }) {
 									Bienvenido a la comunidad
 								</h2>
 								<p className="mt-2.5 text-[14.5px] text-[#7c8a80]">
-									Esperamos que disfrutes tu estancia.
+									Esperamos que disfrutes tu estancia
 								</p>
 							</>
 						) : (

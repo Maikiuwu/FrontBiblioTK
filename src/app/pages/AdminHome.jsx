@@ -74,7 +74,7 @@ function AdminHome({ onLogout }) {
 								</h2>
 								{!option.available && (
 									<span className="rounded-full bg-[#f0eee8] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.08em] text-[#a1a79f]">
-										Próximamente
+										Próximamente.
 									</span>
 								)}
 							</div>
