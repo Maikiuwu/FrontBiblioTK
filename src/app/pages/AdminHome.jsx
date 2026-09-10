@@ -51,7 +51,7 @@ function AdminHome({ onLogout }) {
 						Panel de administración
 					</h1>
 					<p className="mt-2.5 text-sm text-[#718079]">
-						Selecciona una sección para comenzar a gestionar la biblioteca.
+						Selecciona una sección para comenzar a gestionar la biblioteca
 					</p>
 				</header>
 

@@ -118,7 +118,7 @@ function Register({ onBack }) {
 										id="cc"
 										name="cc"
 										className={inputClasses}
-										type="text"
+										type="number"
 										inputMode="numeric"
 										pattern="[0-9]*"
 										placeholder="12345678"
