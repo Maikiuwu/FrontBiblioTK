@@ -12,9 +12,41 @@ const initialFormData = {
 	nombreUsuario: "",
 };
 
+const namePattern = "[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ '-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*";
+const emailPattern = "[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}";
+
+function isValidEmail(value) {
+	return new RegExp(`^${emailPattern}$`).test(value.trim());
+}
+
+function validateForm(formData) {
+	if (!new RegExp(`^${namePattern}$`).test(formData.nombres.trim())) {
+		return "Los nombres solo pueden contener letras, espacios, apóstrofes o guiones.";
+	}
+
+	if (!new RegExp(`^${namePattern}$`).test(formData.apellidos.trim())) {
+		return "Los apellidos solo pueden contener letras, espacios, apóstrofes o guiones.";
+	}
+
+	if (!/^[1-9]\d*$/.test(formData.cc.trim())) {
+		return "La cédula debe ser un número entero mayor que 0.";
+	}
+
+	if (!isValidEmail(formData.email)) {
+		return "Ingresa un correo válido, por ejemplo: tu@correo.com.";
+	}
+
+	if (!/^\d{7,15}$/.test(formData.celular.trim())) {
+		return "El celular debe contener solo números, entre 7 y 15 dígitos.";
+	}
+
+	return "";
+}
+
 function Register({ onBack }) {
 	const [submitted, setSubmitted] = useState(false);
 	const [formData, setFormData] = useState(initialFormData);
+	const [error, setError] = useState("");
 
 	function handleChange(event) {
 		const { name, value } = event.target;
@@ -23,6 +55,14 @@ function Register({ onBack }) {
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
+		const validationError = validateForm(formData);
+
+		if (validationError) {
+			setError(validationError);
+			return;
+		}
+
+		setError("");
 
 		const userData = createRegisterUserDto(formData);
 
@@ -32,7 +72,7 @@ function Register({ onBack }) {
 			setSubmitted(true);
 		} catch (error) {
 			console.error("Error al registrar el usuario:", error);
-			window.alert("No se pudo registrar el usuario. Inténtalo de nuevo.");
+			setError("No se pudo registrar el usuario. Inténtalo de nuevo.");
 		}
 	};
 
@@ -121,6 +161,9 @@ function Register({ onBack }) {
 										type="number"
 										inputMode="numeric"
 										pattern="[0-9]*"
+										min="1"
+										step="1"
+										title="La cédula debe ser un número entero mayor que 0"
 										placeholder="12345678"
 										autoComplete="off"
 										required
@@ -136,6 +179,8 @@ function Register({ onBack }) {
 										className={inputClasses}
 										type="email"
 										placeholder="tu@correo.com"
+										pattern={emailPattern}
+										title="Usa un correo con dominio, por ejemplo tu@correo.com"
 										autoComplete="email"
 										required
 										value={formData.email}
@@ -153,6 +198,9 @@ function Register({ onBack }) {
 										className={inputClasses}
 										type="text"
 										placeholder="María"
+										pattern={namePattern}
+										minLength={2}
+										title="Solo se permiten letras, espacios, apóstrofes o guiones"
 										autoComplete="given-name"
 										required
 										value={formData.nombres}
@@ -167,6 +215,9 @@ function Register({ onBack }) {
 										className={inputClasses}
 										type="text"
 										placeholder="González"
+										pattern={namePattern}
+										minLength={2}
+										title="Solo se permiten letras, espacios, apóstrofes o guiones"
 										autoComplete="family-name"
 										required
 										value={formData.apellidos}
@@ -198,6 +249,8 @@ function Register({ onBack }) {
 										className={inputClasses}
 										type="tel"
 										placeholder="04121234567"
+										pattern="[0-9]{7,15}"
+										title="Ingresa entre 7 y 15 dígitos"
 										autoComplete="tel"
 										required
 										value={formData.celular}
@@ -226,6 +279,12 @@ function Register({ onBack }) {
 									/>
 								</label>
 							</div>
+
+							{error && (
+								<p role="alert" className="m-0 text-center text-xs font-bold text-[#a33f35]">
+									{error}
+								</p>
+							)}
 
 							<label
 								htmlFor="terminos"

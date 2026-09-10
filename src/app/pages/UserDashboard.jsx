@@ -14,6 +14,13 @@ const roleLabels = {
 	superadmin: "Super administradores",
 };
 
+const todayLabel = new Date().toLocaleDateString("es-ES", {
+	weekday: "long",
+	day: "numeric",
+	month: "long",
+	year: "numeric",
+});
+
 function UserDashboard({ onLogout }) {
 	const [roleStats, setRoleStats] = useState({
 		admin: 0,
@@ -80,30 +87,36 @@ function UserDashboard({ onLogout }) {
 	return (
 		<div className="flex min-h-screen flex-col bg-[#f6f3ed] font-['Inter','Segoe_UI',sans-serif] text-[#18332d] md:flex-row">
 			<AdminSidebar onLogout={onLogout} />
-			<main className="mx-auto w-full max-w-[1120px] px-5 py-8 md:px-[6%] md:py-12">
-				<header className="mb-8">
+			<main className="mx-auto w-full max-w-[1120px] px-5 py-8 pb-[50px] md:px-[6%] md:py-12 md:pb-[70px]">
+				<header className="mb-[27px] md:mb-[38px]">
 					<p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#a77a46]">
-						Administración
+						{todayLabel}
 					</p>
-					<h1 className="m-0 font-[Georgia,serif] text-[30px] font-medium text-[#173c33]">
+					<h1 className="m-0 font-[Georgia,serif] text-[26px] font-medium leading-tight tracking-[-0.035em] md:text-[32px]">
 						Usuarios registrados
 					</h1>
+					<p className="mt-2.5 text-sm text-[#718079]">
+						Consulta la distribución de usuarios según su rol en la biblioteca.
+					</p>
 				</header>
 
 				{status === "loading" && (
-					<div className="bg-[#fffdf9] p-8 text-sm text-[#718079]">
+					<div className="bg-[#fffdf9] p-8 text-sm text-[#718079] shadow-[0_10px_30px_rgba(38,63,53,0.05)]">
 						Cargando distribución de usuarios...
 					</div>
 				)}
 
 				{status === "error" && (
-					<div role="alert" className="bg-[#fffdf9] p-8 text-sm text-[#ad5d4b]">
+					<div
+						role="alert"
+						className="bg-[#fffdf9] p-8 text-sm text-[#ad5d4b] shadow-[0_10px_30px_rgba(38,63,53,0.05)]"
+					>
 						{errorMessage}
 					</div>
 				)}
 
 				{status === "success" && (
-					<section className="grid gap-6 bg-[#fffdf9] p-6 md:grid-cols-[minmax(250px,360px)_1fr] md:items-center md:p-10">
+					<section className="grid gap-6 bg-[#fffdf9] p-6 shadow-[0_10px_30px_rgba(38,63,53,0.05)] md:grid-cols-[minmax(250px,360px)_1fr] md:items-center md:p-10">
 						<div className="flex flex-col items-center gap-5">
 							<div
 								className="grid size-56 place-items-center rounded-full"
