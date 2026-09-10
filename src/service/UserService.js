@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const API_BASE_URL = "http://localhost:3000/RegistroBiblioTK";
 
 /**
@@ -21,3 +22,20 @@ export async function getUsers() {
 
 	return await response.json();
 }
+=======
+const usersDashboardUrl =
+	import.meta.env.VITE_USERS_DASHBOARD_URL ??
+	"http://localhost:3002/DashboardBibliotk/Udashboard";
+
+export async function getUserRoleStats() {
+	const response = await fetch(usersDashboardUrl, {
+		cache: "no-store",
+	});
+
+	if (!response.ok) {
+		throw new Error("No se pudieron obtener las estadísticas de usuarios.");
+	}
+
+	return await response.json();
+}
+>>>>>>> 8fea78522a336ce9d9b33fb80054be075e11eb89
