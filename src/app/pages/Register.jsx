@@ -86,7 +86,7 @@ function Register({ onBack }) {
 									Bienvenido a la comunidad
 								</h2>
 								<p className="mt-2.5 text-[14.5px] text-[#7c8a80]">
-									Esperamos que disfrutes tu estancia.
+									Esperamos que disfrutes tu estancia
 								</p>
 							</>
 						) : (
@@ -118,7 +118,7 @@ function Register({ onBack }) {
 										id="cc"
 										name="cc"
 										className={inputClasses}
-										type="text"
+										type="number"
 										inputMode="numeric"
 										pattern="[0-9]*"
 										placeholder="12345678"
