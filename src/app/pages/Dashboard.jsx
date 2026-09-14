@@ -1,91 +1,67 @@
-const loans = [];
+import { BookOpen } from "@phosphor-icons/react";
+import ReaderLayout from "../components/layout/ReaderLayout.jsx";
+import { cn } from "../utils/cn.js";
+import { formatToday } from "../utils/format.js";
 
-export function Sidebar({ onLogout }) {
-	return (
-		<aside className="flex w-full flex-none flex-col bg-[#173c33] p-[18px_20px] text-[#f7f3eb] md:w-[255px] md:p-[37px_23px_25px]">
-			<div className="flex items-center gap-2.5 text-[22px] font-bold tracking-[-0.04em]">
-				<span className="grid size-[34px] place-items-center rounded-full border border-[#d4a15f] text-[#d4a15f]">
-					BT
-				</span>
-				<span>BiblioTK</span>
-			</div>
-			<nav className="mt-[25px] flex gap-2 md:mt-[85px] md:grid">
-				<button className="flex flex-1 items-center gap-[13px] rounded border-0 bg-[#285b4b] px-3.5 py-[13px] text-left text-xs text-[#f8f1e5] md:flex-none">
-					Resumen
-				</button>
-			</nav>
-			<div className="mt-auto hidden md:block">
-				<div className="mb-[23px] flex items-center gap-2.5 border-b border-[#376253] px-[7px] pb-[22px]">
-					<div className="grid size-[34px] place-items-center rounded-full bg-[#c28b4e] text-[10px] font-bold text-white">
-						MG
-					</div>
-					<div>
-						<strong className="block text-[11px] text-[#f2f1e9]">
-							María González
-						</strong>
-						<small className="mt-0.5 block text-[10px] text-[#8fa99d]">
-							Lectora
-						</small>
-					</div>
-				</div>
-				<button
-					className="border-0 bg-transparent px-[7px] py-[13px] text-xs text-[#8fa99d] hover:text-white"
-					onClick={onLogout}
-				>
-					Cerrar sesión
-				</button>
-			</div>
-		</aside>
-	);
-}
+const statusTones = {
+	green: "bg-pine-100 text-pine-800",
+	blue: "bg-sand-200 text-pine-900",
+};
 
-export function LoanTable({ compact = false, rows = loans }) {
+const summary = [
+	{ label: "Préstamos activos", value: "0" },
+	{ label: "Por devolver", value: "0", unit: "días" },
+	{ label: "Libros leídos", value: "0" },
+];
+
+export function LoanTable({ compact = false, rows = [] }) {
 	const visibleLoans = compact ? rows.slice(0, 3) : rows;
-	if (!visibleLoans.length)
+
+	if (!visibleLoans.length) {
 		return (
-			<div className="grid min-h-[150px] place-content-center gap-2 bg-[#fffdf9] text-center text-[#8c9991]">
-				<strong className="font-[Georgia,serif] text-base text-[#375148]">
+			<div className="grid place-items-center gap-3 rounded-[24px] bg-sand-50 px-6 py-14 text-center shadow-[inset_0_0_0_1px_var(--color-sand-200)]">
+				<span className="grid size-12 place-items-center rounded-2xl bg-pine-900 text-honey-300">
+					<BookOpen aria-hidden="true" className="size-6" />
+				</span>
+				<strong className="font-display text-xl font-extrabold tracking-[-0.03em] text-pine-950">
 					Aún no tienes préstamos
 				</strong>
-				<p className="m-0 text-[11px]">
-					Cuando solicites un libro, aparecerá aquí.
+				<p className="max-w-xs text-sm text-ink-soft">
+					Cuando solicites un libro, aparecerá aquí con su fecha de devolución.
 				</p>
 			</div>
 		);
+	}
+
 	return (
-		<div className="overflow-x-auto bg-[#fffdf9]">
-			<table className="w-full min-w-[650px] border-collapse">
+		<div className="overflow-x-auto rounded-[24px] bg-sand-50 shadow-[inset_0_0_0_1px_var(--color-sand-200)]">
+			<table className="w-full min-w-[40rem] border-collapse text-left">
 				<thead>
-					<tr>
-						<th className="border-b border-[#ebe8df] px-5 py-[15px] text-left text-[9px] tracking-[0.1em] text-[#a1a79f]">
-							LIBRO
-						</th>
-						<th className="border-b border-[#ebe8df] px-5 py-[15px] text-left text-[9px] tracking-[0.1em] text-[#a1a79f]">
-							FECHA DE PRÉSTAMO
-						</th>
-						<th className="border-b border-[#ebe8df] px-5 py-[15px] text-left text-[9px] tracking-[0.1em] text-[#a1a79f]">
-							DEVOLUCIÓN
-						</th>
-						<th className="border-b border-[#ebe8df] px-5 py-[15px] text-left text-[9px] tracking-[0.1em] text-[#a1a79f]">
-							ESTADO
-						</th>
+					<tr className="text-xs font-semibold text-ink-soft">
+						<th className="px-6 py-4">Libro</th>
+						<th className="px-6 py-4">Fecha de préstamo</th>
+						<th className="px-6 py-4">Devolución</th>
+						<th className="px-6 py-4">Estado</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody className="divide-y divide-sand-200">
 					{visibleLoans.map((loan) => (
 						<tr key={loan.title}>
-							<td className="border-b border-[#f0eee8] px-5 py-4 text-[11px] text-[#64736b]">
+							<td className="px-6 py-4 text-sm font-medium text-pine-950">
 								{loan.title}
 							</td>
-							<td className="border-b border-[#f0eee8] px-5 py-4 text-[11px] text-[#64736b]">
+							<td className="px-6 py-4 text-sm text-ink-soft tabular-nums">
 								{loan.date}
 							</td>
-							<td className="border-b border-[#f0eee8] px-5 py-4 text-[11px] text-[#64736b]">
+							<td className="px-6 py-4 text-sm text-ink-soft tabular-nums">
 								{loan.due}
 							</td>
-							<td>
+							<td className="px-6 py-4">
 								<span
-									className={`inline-block rounded-full px-2.5 py-1.5 text-[9px] font-bold ${loan.tone === "green" ? "bg-[#dcebe0] text-[#357358]" : loan.tone === "blue" ? "bg-[#e0eaf0] text-[#4d7290]" : "bg-[#f5ded8] text-[#ad5d4b]"}`}
+									className={cn(
+										"inline-block rounded-md px-2.5 py-1 text-xs font-semibold",
+										statusTones[loan.tone] ?? "bg-clay-50 text-clay-700",
+									)}
 								>
 									{loan.status}
 								</span>
@@ -100,86 +76,58 @@ export function LoanTable({ compact = false, rows = loans }) {
 
 function Dashboard({ onLogout }) {
 	return (
-		<div className="mx-auto w-full max-w-[1120px] px-5 py-8 pb-[50px] md:px-[6%] md:py-12 md:pb-[70px]">
-			<header className="mb-[27px] flex items-start justify-between md:mb-[38px]">
-				<div>
-					<p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#a77a46]">
-						Martes, 12 de marzo de 2024
-					</p>
-					<h1 className="m-0 font-[Georgia,serif] text-[26px] font-medium leading-tight tracking-[-0.035em] md:text-[32px]">
-						Buenos días, María
-					</h1>
-				</div>
-				<button
-					type="button"
-					className="border-0 bg-transparent px-0 text-xs font-bold text-[#a77a46] hover:underline"
-					onClick={onLogout}
-				>
-					Cerrar sesión
-				</button>
+		<ReaderLayout onLogout={onLogout}>
+			<header className="pt-6 motion-safe:animate-rise">
+				<p className="text-sm font-medium text-ink-soft">{formatToday()}</p>
+				<h1 className="mt-3 font-display text-[clamp(2.5rem,5.5vw,4rem)] leading-[0.94] font-extrabold tracking-[-0.045em] text-pine-950">
+					Mis lecturas
+				</h1>
 			</header>
-			<section className="mb-[26px] min-h-[198px] bg-[#295c4e] px-[25px] py-7 text-[#f5f3e7] md:px-[39px] md:py-[33px]">
-				<div>
-					<p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#e0b46f]">
-						Tu rincón de lectura
-					</p>
-					<h2 className="m-0 mb-[11px] font-[Georgia,serif] text-[31px] font-medium leading-[1.08]">
-						Una página más,
-						<br />
-						un mundo nuevo.
-					</h2>
-					<p className="m-0 text-xs text-[#bed2c5]">
-						Continúa explorando historias que te están esperando.
-					</p>
+
+			<section className="grain relative isolate mt-10 overflow-hidden rounded-[28px] bg-pine-900 px-7 py-12 text-sand-50 md:px-12 md:py-16">
+				<div
+					aria-hidden="true"
+					className="pointer-events-none absolute -right-20 -bottom-24 size-80 rounded-full border border-honey-400/30 shadow-[0_0_0_40px_rgb(217_165_90/0.05)] md:size-[26rem]"
+				/>
+				<p className="relative text-sm font-semibold text-honey-300">
+					Tu rincón de lectura
+				</p>
+				<h2 className="relative mt-3 max-w-lg font-display text-[clamp(2rem,4.5vw,3.25rem)] leading-[0.98] font-extrabold tracking-[-0.04em]">
+					Una página más, un mundo nuevo.
+				</h2>
+				<p className="relative mt-4 max-w-md text-[15px] text-pine-200">
+					Continúa explorando historias que te están esperando.
+				</p>
+			</section>
+
+			<section
+				aria-label="Resumen de tu actividad"
+				className="mt-3 grid gap-px overflow-hidden rounded-[28px] bg-sand-200 sm:grid-cols-3"
+			>
+				{summary.map((item) => (
+					<div key={item.label} className="bg-sand-50 px-6 py-7">
+						<p className="text-sm text-ink-soft">{item.label}</p>
+						<p className="mt-2 text-4xl font-semibold tracking-[-0.04em] text-pine-950">
+							{item.value}
+							{item.unit && (
+								<span className="ml-1.5 text-sm font-medium text-ink-soft">
+									{item.unit}
+								</span>
+							)}
+						</p>
+					</div>
+				))}
+			</section>
+
+			<section className="mt-12">
+				<h2 className="font-display text-2xl font-extrabold tracking-[-0.035em] text-pine-950">
+					Mis préstamos
+				</h2>
+				<div className="mt-5">
+					<LoanTable compact />
 				</div>
 			</section>
-			<div className="mb-[35px] grid gap-2 md:mb-[50px] md:grid-cols-3 md:gap-4">
-				<article className="bg-[#fffdf9] px-[17px] py-[13px] md:px-5 md:py-[18px]">
-					<div>
-						<small className="block text-[10px] text-[#78867f]">
-							Préstamos activos
-						</small>
-						<strong className="mt-1 block font-[Georgia,serif] text-2xl font-semibold text-[#18332d]">
-							00
-						</strong>
-					</div>
-				</article>
-				<article className="bg-[#fffdf9] px-[17px] py-[13px] md:px-5 md:py-[18px]">
-					<div>
-						<small className="block text-[10px] text-[#78867f]">
-							Por devolver
-						</small>
-						<strong className="mt-1 block font-[Georgia,serif] text-2xl font-semibold text-[#18332d]">
-							00{" "}
-							<small className="inline font-['Trebuchet_MS',sans-serif] text-[11px]">
-								días
-							</small>
-						</strong>
-					</div>
-				</article>
-				<article className="bg-[#fffdf9] px-[17px] py-[13px] md:px-5 md:py-[18px]">
-					<div>
-						<small className="block text-[10px] text-[#78867f]">
-							Libros leídos
-						</small>
-						<strong className="mt-1 block font-[Georgia,serif] text-2xl font-semibold text-[#18332d]">
-							00
-						</strong>
-					</div>
-				</article>
-			</div>
-			<section className="mb-[19px] flex items-end justify-between">
-				<div>
-					<p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#a77a46]">
-						Actividad reciente
-					</p>
-					<h2 className="m-0 font-[Georgia,serif] text-[25px] font-medium">
-						Mis préstamos
-					</h2>
-				</div>
-			</section>
-			<LoanTable compact />
-		</div>
+		</ReaderLayout>
 	);
 }
 
