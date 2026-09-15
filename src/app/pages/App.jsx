@@ -7,14 +7,10 @@ import {
 	useNavigate,
 } from "react-router-dom";
 
-import {
-	getCurrentSession,
-	logoutUser,
-} from "../../service/LoginService";
+import { getCurrentSession, logoutUser } from "../../service/LoginService";
 
 import AdminHome from "./AdminHome.jsx";
 import Construccion from "./Construccion.jsx";
-import Dashboard from "./Dashboard.jsx";
 import Login from "./Login.jsx";
 import Register from "./Register.jsx";
 import UserDashboard from "./UserDashboard.jsx";
@@ -67,7 +63,9 @@ function App() {
 					location.pathname.startsWith("/admin") ||
 					location.pathname === "/construccion"
 				) {
-					setSessionMessage("Tu sesión finalizó. Debes iniciar sesión nuevamente.");
+					setSessionMessage(
+						"Tu sesión finalizó. Debes iniciar sesión nuevamente.",
+					);
 					navigate("/login", { replace: true });
 				} else if (location.pathname === "/") {
 					navigate("/login", { replace: true });
@@ -95,7 +93,9 @@ function App() {
 			} catch {
 				setSession(null);
 				setAuthStatus("anonymous");
-				setSessionMessage("Tu sesión finalizó. Debes iniciar sesión nuevamente.");
+				setSessionMessage(
+					"Tu sesión finalizó. Debes iniciar sesión nuevamente.",
+				);
 				navigate("/login", { replace: true });
 			}
 		}, 10000);
@@ -115,8 +115,24 @@ function App() {
 
 	if (authStatus === "checking") {
 		return (
-			<main className="grid min-h-screen place-items-center bg-[#f6f3ed] text-sm text-[#375148]">
-				Comprobando tu sesión...
+			<main
+				aria-busy="true"
+				className="grid min-h-dvh place-items-center bg-sand-100"
+			>
+				<div className="flex flex-col items-center gap-5 motion-safe:animate-fade [animation-delay:150ms]">
+					<span className="relative grid size-16 place-items-center">
+						<span
+							aria-hidden="true"
+							className="absolute inset-0 rounded-full border-2 border-pine-900/10 border-t-honey-500 animate-[spin_800ms_linear_infinite]"
+						/>
+						<span className="font-display text-lg font-extrabold text-pine-900">
+							BT
+						</span>
+					</span>
+					<p role="status" className="text-sm font-medium text-ink-soft">
+						Comprobando tu sesión...
+					</p>
+				</div>
 			</main>
 		);
 	}
@@ -129,16 +145,18 @@ function App() {
 					authStatus === "authenticated" ? (
 						<Navigate to={getAuthenticatedPath(session)} replace />
 					) : (
-					<Login
+						<Login
 							onLogin={async () => {
 								const currentSession = await getCurrentSession();
 								setSession(currentSession);
 								setAuthStatus("authenticated");
-								navigate(getAuthenticatedPath(currentSession), { replace: true });
+								navigate(getAuthenticatedPath(currentSession), {
+									replace: true,
+								});
 							}}
-						onRegister={() => navigate("/register")}
-						sessionMessage={sessionMessage}
-					/>
+							onRegister={() => navigate("/register")}
+							sessionMessage={sessionMessage}
+						/>
 					)
 				}
 			/>
@@ -149,8 +167,9 @@ function App() {
 			<Route
 				path="/admin"
 				element={
-					authStatus === "authenticated" && getSessionRole(session) === "admin" ? (
-						<AdminHome onLogout={handleLogout} />
+					authStatus === "authenticated" &&
+					getSessionRole(session) === "admin" ? (
+						<AdminHome onLogout={handleLogout} user={session?.user} />
 					) : (
 						<Navigate to="/login" replace />
 					)
@@ -159,8 +178,9 @@ function App() {
 			<Route
 				path="/admin/usuarios"
 				element={
-					authStatus === "authenticated" && getSessionRole(session) === "admin" ? (
-						<UserDashboard onLogout={handleLogout} />
+					authStatus === "authenticated" &&
+					getSessionRole(session) === "admin" ? (
+						<UserDashboard onLogout={handleLogout} user={session?.user} />
 					) : (
 						<Navigate to="/login" replace />
 					)
@@ -176,7 +196,10 @@ function App() {
 					)
 				}
 			/>
-			<Route path="/dashboard" element={<Navigate to="/construccion" replace />} />
+			<Route
+				path="/dashboard"
+				element={<Navigate to="/construccion" replace />}
+			/>
 			<Route path="*" element={<Navigate to="/login" replace />} />
 		</Routes>
 	);

@@ -1,38 +1,27 @@
-import { useNavigate } from "react-router-dom";
+import ReaderLayout from "../components/layout/ReaderLayout.jsx";
 
 function Construccion({ onLogout }) {
-	const navigate = useNavigate();
-
 	return (
-		<main className="grid min-h-screen place-items-center bg-[#f6f3ed] px-5 font-['Inter','Segoe_UI',sans-serif] text-[#18332d]">
-			<section className="w-full max-w-[520px] bg-[#fffdf9] px-7 py-10 text-center shadow-[0_18px_50px_rgba(38,63,53,0.08)]">
-				<p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#a77a46]">
-					BiblioTK
-				</p>
-				<h1 className="m-0 font-[Georgia,serif] text-[30px] font-medium text-[#173c33]">
-					Página en construcción
-				</h1>
-				<p className="mt-3 text-sm leading-relaxed text-[#718079]">
-					Tu cuenta está activa, pero esta sección todavía no está disponible.
-				</p>
-				<div className="mt-7 flex justify-center gap-3">
-					<button
-						type="button"
-						className="border-0 bg-[#295c4e] px-4 py-3 text-xs font-bold text-white hover:bg-[#173c33]"
-						onClick={() => navigate("/login")}
-					>
-						Volver
-					</button>
-					<button
-						type="button"
-						className="border border-[#d7d8ce] bg-transparent px-4 py-3 text-xs font-bold text-[#375148] hover:border-[#a77a46]"
-						onClick={onLogout}
-					>
-						Cerrar sesión
-					</button>
+		<ReaderLayout onLogout={onLogout}>
+			<section className="grain relative isolate overflow-hidden rounded-[32px] bg-pine-900 px-7 py-16 text-sand-50 md:px-16 md:py-28">
+				<div
+					aria-hidden="true"
+					className="pointer-events-none absolute -top-40 -right-32 size-[26rem] rounded-full border border-honey-400/35 shadow-[0_0_0_48px_rgb(217_165_90/0.06),0_0_0_96px_rgb(217_165_90/0.04)] md:size-[40rem]"
+				/>
+				<div className="relative max-w-3xl">
+					<p className="text-sm font-semibold text-honey-300 motion-safe:animate-rise">
+						Tu cuenta está activa
+					</p>
+					<h1 className="mt-4 font-display text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.92] font-extrabold tracking-[-0.05em] motion-safe:animate-rise [animation-delay:60ms]">
+						Tu espacio de lectura está en construcción.
+					</h1>
+					<p className="mt-6 max-w-lg text-base leading-relaxed text-pine-200 motion-safe:animate-rise [animation-delay:120ms]">
+						Esta sección todavía no está disponible. Pronto podrás consultar el
+						catálogo y seguir tus préstamos desde aquí.
+					</p>
 				</div>
 			</section>
-		</main>
+		</ReaderLayout>
 	);
 }
 
