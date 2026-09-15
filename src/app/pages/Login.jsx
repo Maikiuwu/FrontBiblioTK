@@ -31,6 +31,12 @@ function Login({ onLogin, onRegister, sessionMessage }) {
 			return;
 		}
 
+
+		if (!isValidEmail(email)) {
+			setError("Ingresa un correo válido, por ejemplo: tu@correo.com.");
+			return;
+		}
+
 		setIsSubmitting(true);
 
 		try {
