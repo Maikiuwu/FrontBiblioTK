@@ -13,6 +13,7 @@
 		"check:unsafe": "biome check --write --unsafe"
 	},
 	"dependencies": {
+		"bibliotk-ui": "^0.1.0",
 		"@fontsource-variable/bricolage-grotesque": "^5.3.0",
 		"@fontsource-variable/geist": "^5.3.0",
 		"@phosphor-icons/react": "^2.1.10",

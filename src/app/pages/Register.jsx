@@ -1,15 +1,22 @@
 import { ArrowLeft, ArrowRight, CheckCircle } from "@phosphor-icons/react";
+import {
+	Alert,
+	AuthLayout,
+	authHeadlineClasses,
+	Button,
+	Checkbox,
+	PasswordField,
+	TextField,
+} from "bibliotk-ui";
 import { useState } from "react";
 import { registerUser } from "../../service/RegisterService";
-import AuthLayout, {
-	authHeadlineClasses,
-} from "../components/layout/AuthLayout.jsx";
-import Alert from "../components/ui/Alert.jsx";
-import Button from "../components/ui/Button.jsx";
-import Checkbox from "../components/ui/Checkbox.jsx";
-import PasswordField from "../components/ui/PasswordField.jsx";
-import TextField from "../components/ui/TextField.jsx";
 import { createRegisterUserDto } from "../dto/registerUser.dto";
+import {
+	emailPattern,
+	fieldLimits,
+	namePattern,
+	validateUserData,
+} from "../utils/userValidation.js";
 
 const initialFormData = {
 	nombres: "",
@@ -20,54 +27,6 @@ const initialFormData = {
 	celular: "",
 	nombreUsuario: "",
 };
-
-const namePattern = "[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ '-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*";
-const emailPattern = "[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}";
-
-function isValidEmail(value) {
-	return new RegExp(`^${emailPattern}$`).test(value.trim());
-}
-
-function validateForm(formData) {
-	if (!new RegExp(`^${namePattern}$`).test(formData.nombres.trim())) {
-		return {
-			field: "nombres",
-			message:
-				"Los nombres solo pueden contener letras, espacios, apóstrofes o guiones.",
-		};
-	}
-
-	if (!new RegExp(`^${namePattern}$`).test(formData.apellidos.trim())) {
-		return {
-			field: "apellidos",
-			message:
-				"Los apellidos solo pueden contener letras, espacios, apóstrofes o guiones.",
-		};
-	}
-
-	if (!/^[1-9]\d*$/.test(formData.cc.trim())) {
-		return {
-			field: "cc",
-			message: "La cédula debe ser un número entero mayor que 0.",
-		};
-	}
-
-	if (!isValidEmail(formData.email)) {
-		return {
-			field: "email",
-			message: "Ingresa un correo válido, por ejemplo: tu@correo.com.",
-		};
-	}
-
-	if (!/^\d{7,15}$/.test(formData.celular.trim())) {
-		return {
-			field: "celular",
-			message: "El celular debe contener solo números, entre 7 y 15 dígitos.",
-		};
-	}
-
-	return null;
-}
 
 function Register({ onBack }) {
 	const [submitted, setSubmitted] = useState(false);
@@ -91,7 +50,7 @@ function Register({ onBack }) {
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
-		const validationError = validateForm(formData);
+		const validationError = validateUserData(formData);
 
 		if (validationError) {
 			setFieldError(validationError);
@@ -199,6 +158,7 @@ function Register({ onBack }) {
 							type="email"
 							placeholder="tu@correo.com"
 							pattern={emailPattern}
+							maxLength={fieldLimits.email}
 							title="Usa un correo con dominio, por ejemplo tu@correo.com"
 							autoComplete="email"
 							required
@@ -214,6 +174,7 @@ function Register({ onBack }) {
 							placeholder="María"
 							pattern={namePattern}
 							minLength={2}
+							maxLength={fieldLimits.nombres}
 							title="Solo se permiten letras, espacios, apóstrofes o guiones"
 							autoComplete="given-name"
 							required
@@ -229,6 +190,7 @@ function Register({ onBack }) {
 							placeholder="González"
 							pattern={namePattern}
 							minLength={2}
+							maxLength={fieldLimits.apellidos}
 							title="Solo se permiten letras, espacios, apóstrofes o guiones"
 							autoComplete="family-name"
 							required
@@ -242,6 +204,7 @@ function Register({ onBack }) {
 							label="Nombre de usuario"
 							type="text"
 							placeholder="mari"
+							maxLength={fieldLimits.nombreUsuario}
 							autoComplete="username"
 							required
 							value={formData.nombreUsuario}

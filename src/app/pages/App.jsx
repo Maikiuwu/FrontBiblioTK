@@ -1,6 +1,8 @@
+import { PanelLayout } from "bibliotk-ui";
 import { useEffect, useState } from "react";
 import {
 	Navigate,
+	Outlet,
 	Route,
 	Routes,
 	useLocation,
@@ -9,11 +11,25 @@ import {
 
 import { getCurrentSession, logoutUser } from "../../service/LoginService";
 
-import AdminHome from "./AdminHome.jsx";
 import Construccion from "./Construccion.jsx";
+import Home from "./Home.jsx";
 import Login from "./Login.jsx";
+import Profile from "./Profile.jsx";
 import Register from "./Register.jsx";
 import UserDashboard from "./UserDashboard.jsx";
+
+const homePath = "/inicio";
+const protectedPaths = [homePath, "/perfil", "/construccion", "/admin"];
+
+const adminNavItems = [
+	{ to: homePath, label: "Resumen", end: true },
+	{ to: "/admin/usuarios", label: "Usuarios" },
+];
+
+const readerNavItems = [
+	{ to: homePath, label: "Inicio", end: true },
+	{ to: "/perfil", label: "Mi perfil" },
+];
 
 function getSessionRole(session) {
 	return String(
@@ -25,8 +41,10 @@ function getSessionRole(session) {
 	).toLowerCase();
 }
 
-function getAuthenticatedPath(session) {
-	return getSessionRole(session) === "admin" ? "/admin" : "/construccion";
+function isProtectedPath(pathname) {
+	return protectedPaths.some(
+		(path) => pathname === path || pathname.startsWith(`${path}/`),
+	);
 }
 
 function App() {
@@ -43,7 +61,10 @@ function App() {
 		}
 
 		let isActive = true;
-		setAuthStatus("checking");
+		// Con la sesión ya confirmada se revalida en segundo plano, sin volver a la pantalla de carga
+		setAuthStatus((currentStatus) =>
+			currentStatus === "authenticated" ? currentStatus : "checking",
+		);
 
 		getCurrentSession()
 			.then((currentSession) => {
@@ -52,17 +73,14 @@ function App() {
 				setAuthStatus("authenticated");
 				setSessionMessage("");
 				if (location.pathname === "/" || location.pathname === "/login") {
-					navigate(getAuthenticatedPath(currentSession), { replace: true });
+					navigate(homePath, { replace: true });
 				}
 			})
 			.catch(() => {
 				if (!isActive) return;
 				setSession(null);
 				setAuthStatus("anonymous");
-				if (
-					location.pathname.startsWith("/admin") ||
-					location.pathname === "/construccion"
-				) {
+				if (isProtectedPath(location.pathname)) {
 					setSessionMessage(
 						"Tu sesión finalizó. Debes iniciar sesión nuevamente.",
 					);
@@ -78,11 +96,7 @@ function App() {
 	}, [location.pathname, navigate]);
 
 	useEffect(() => {
-		if (
-			authStatus !== "authenticated" ||
-			(!location.pathname.startsWith("/admin") &&
-				location.pathname !== "/construccion")
-		) {
+		if (authStatus !== "authenticated" || !isProtectedPath(location.pathname)) {
 			return undefined;
 		}
 
@@ -113,6 +127,17 @@ function App() {
 		}
 	}
 
+	async function handleAccountDeleted() {
+		// El servicio de perfil ya borró la cookie; cerrar sesión aquí es solo un refuerzo
+		await logoutUser().catch(() => undefined);
+		setSession(null);
+		setAuthStatus("anonymous");
+		setSessionMessage(
+			"Tu cuenta fue eliminada. Gracias por haber sido parte de BiblioTK.",
+		);
+		navigate("/login", { replace: true });
+	}
+
 	if (authStatus === "checking") {
 		return (
 			<main
@@ -137,22 +162,23 @@ function App() {
 		);
 	}
 
+	const role = getSessionRole(session);
+	const isAuthenticated = authStatus === "authenticated";
+
 	return (
 		<Routes>
 			<Route
 				path="/login"
 				element={
-					authStatus === "authenticated" ? (
-						<Navigate to={getAuthenticatedPath(session)} replace />
+					isAuthenticated ? (
+						<Navigate to={homePath} replace />
 					) : (
 						<Login
 							onLogin={async () => {
 								const currentSession = await getCurrentSession();
 								setSession(currentSession);
 								setAuthStatus("authenticated");
-								navigate(getAuthenticatedPath(currentSession), {
-									replace: true,
-								});
+								navigate(homePath, { replace: true });
 							}}
 							onRegister={() => navigate("/register")}
 							sessionMessage={sessionMessage}
@@ -165,41 +191,40 @@ function App() {
 				element={<Register onBack={() => navigate("/login")} />}
 			/>
 			<Route
-				path="/admin"
 				element={
-					authStatus === "authenticated" &&
-					getSessionRole(session) === "admin" ? (
-						<AdminHome onLogout={handleLogout} user={session?.user} />
+					isAuthenticated ? (
+						<PanelLayout
+							navItems={role === "admin" ? adminNavItems : readerNavItems}
+							homePath={homePath}
+							userLabel={session?.user?.email}
+							onLogout={handleLogout}
+						>
+							<Outlet />
+						</PanelLayout>
 					) : (
 						<Navigate to="/login" replace />
 					)
 				}
-			/>
-			<Route
-				path="/admin/usuarios"
-				element={
-					authStatus === "authenticated" &&
-					getSessionRole(session) === "admin" ? (
-						<UserDashboard onLogout={handleLogout} user={session?.user} />
-					) : (
-						<Navigate to="/login" replace />
-					)
-				}
-			/>
-			<Route
-				path="/construccion"
-				element={
-					authStatus === "authenticated" ? (
-						<Construccion onLogout={handleLogout} />
-					) : (
-						<Navigate to="/login" replace />
-					)
-				}
-			/>
-			<Route
-				path="/dashboard"
-				element={<Navigate to="/construccion" replace />}
-			/>
+			>
+				<Route
+					path={homePath}
+					element={<Home role={role} onAccountDeleted={handleAccountDeleted} />}
+				/>
+				<Route path="/perfil" element={<Profile />} />
+				<Route path="/construccion" element={<Construccion />} />
+				<Route
+					path="/admin/usuarios"
+					element={
+						role === "admin" ? (
+							<UserDashboard />
+						) : (
+							<Navigate to={homePath} replace />
+						)
+					}
+				/>
+			</Route>
+			<Route path="/admin" element={<Navigate to={homePath} replace />} />
+			<Route path="/dashboard" element={<Navigate to={homePath} replace />} />
 			<Route path="*" element={<Navigate to="/login" replace />} />
 		</Routes>
 	);

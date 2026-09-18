@@ -1,14 +1,15 @@
 import { ArrowRight } from "@phosphor-icons/react";
+import {
+	Alert,
+	AuthLayout,
+	authHeadlineClasses,
+	Button,
+	Checkbox,
+	PasswordField,
+	TextField,
+} from "bibliotk-ui";
 import { useState } from "react";
 import { loginUser } from "../../service/LoginService";
-import AuthLayout, {
-	authHeadlineClasses,
-} from "../components/layout/AuthLayout.jsx";
-import Alert from "../components/ui/Alert.jsx";
-import Button from "../components/ui/Button.jsx";
-import Checkbox from "../components/ui/Checkbox.jsx";
-import PasswordField from "../components/ui/PasswordField.jsx";
-import TextField from "../components/ui/TextField.jsx";
 import { createLoginUserDto } from "../dto/loginUser.dto";
 
 function Login({ onLogin, onRegister, sessionMessage }) {
@@ -30,7 +31,6 @@ function Login({ onLogin, onRegister, sessionMessage }) {
 			setError("Ingresa un correo válido, por ejemplo: tu@correo.com.");
 			return;
 		}
-
 
 		if (!isValidEmail(email)) {
 			setError("Ingresa un correo válido, por ejemplo: tu@correo.com.");
