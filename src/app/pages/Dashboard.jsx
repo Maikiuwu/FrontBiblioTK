@@ -1,7 +1,5 @@
 import { BookOpen } from "@phosphor-icons/react";
-import ReaderLayout from "../components/layout/ReaderLayout.jsx";
-import { cn } from "../utils/cn.js";
-import { formatToday } from "../utils/format.js";
+import { cn, formatToday, ReaderLayout } from "bibliotk-ui";
 
 const statusTones = {
 	green: "bg-pine-100 text-pine-800",
